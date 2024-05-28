@@ -21,7 +21,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 600 },
+            gravity: { y: 1000 },
             debug: false
         }
     },
@@ -43,6 +43,8 @@ var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
+direction = "right";
+var hitbox;
 
 var game = new Phaser.Game(config);
 
@@ -75,19 +77,17 @@ function create ()
 
     // The player and its settings
     player = this.physics.add.sprite(300, 450, 'dude');
-    hitbox = this.physics.add.sprite(100,100, "hitbox");
-    hitbox.body.enable = false;
 
     // Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(1);
+    player.setBounce(0.3);
     player.setCollideWorldBounds(true);
     player.setScale(10);
 
     // Our player animations, turning, walking left and walking right.
     this.anims.create({
         key: 'left',
-        frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 15 }),
-        frameRate: 10,
+        frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
+        frameRate: 8,
         repeat: -1
     });
 
@@ -101,15 +101,22 @@ function create ()
     this.anims.create({
         key: 'right',
         frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 8 }),
-        frameRate: 10,
+        frameRate: 8,
         repeat: -1
     });
 
     this.anims.create({
-        key: 'attack',
-        frames: this.anims.generateFrameNumbers('dude', { start: 2, end: 2 }),
-        frameRate: 10,
-        repeat: -1
+        key: 'attack1',
+        frames: this.anims.generateFrameNumbers('dude', { start: 14, end: 14 }),
+        frameRate: 1,
+        repeat: 0
+    });
+
+    this.anims.create({
+        key: 'attack2',
+        frames: this.anims.generateFrameNumbers('dude', { start: 15, end: 15 }),
+        frameRate: 1,
+        repeat: 0
     });
 
     this.anims.create({
@@ -124,6 +131,7 @@ function create ()
 
     // Input Events
     cursors = this.input.keyboard.createCursorKeys();
+    
 
         // Add and play the background music
     var music = this.sound.add('backgroundMusic');
@@ -161,6 +169,7 @@ function create ()
 
 function update ()
 {
+    
     if (gameOver)
     {
         return;
@@ -170,25 +179,30 @@ function update ()
     {
         player.setVelocityX(-400);
         player.anims.play('left', true);
+        direction = "left";
+        console.log(direction);
     }
     else if (cursors.right.isDown)
     {
         player.setVelocityX(400);
         player.anims.play('right', true);
+        direction = "right";
+        console.log(direction);
     }
-    else if (cursors.down.isDown)
+    else if ((cursors.down.isDown)&&(direction == "right"))
     {
         player.setVelocityX(0);
-        player.anims.play('attack', true);
+        player.anims.play('attack1', true);
 
-        hitbox.body.enable = true;
-        hitbox.setPosition(player.x + (player.flipX ? -32 : 32), player.y);
-        
-        // Disable the hitbox after a short delay
-        this.time.delayedCall(300, () => {
-            hitbox.body.enable = false;
-            player.anims.play('idle');
-        }, [], this);
+        let hitbox = createHitbox.call(this, player.x + 200, player.y).setScale(5);
+
+    }
+    else if ((cursors.down.isDown)&&(direction == "left"))
+    {
+        player.setVelocityX(0);
+        player.anims.play('attack2', true);
+
+        let hitbox = createHitbox.call(this, player.x - 200, player.y).setScale(5);
     }
     else
     {
@@ -213,7 +227,7 @@ function collectStar (player, star)
     score += 10;
     scoreText.setText('Score: ' + score);
 
-    if (stars.countActive(true) === 0)
+    if (stars.countActive(true) === -1)
     {
         //  A new batch of stars to collect
         stars.children.iterate(function (child) {
@@ -224,16 +238,17 @@ function collectStar (player, star)
 
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
+        // // var bomb = bombs.create(x, 16, 'bomb');
+        // bomb.setBounce(1);
+        // bomb.setCollideWorldBounds(true);
+        // bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        // bomb.allowGravity = false;
 
     }
 }
 
 function hitBomb (player, bomb)
+
 {
     this.physics.pause();
 
@@ -244,6 +259,26 @@ function hitBomb (player, bomb)
     gameOver = true;
 }
 
+function createHitbox(x, y) {
+    // Destroy existing hitbox if it exists
+    if (hitbox) {
+        hitbox.destroy();
+    }
+
+    hitbox = this.physics.add.sprite(x, y, null).setSize(32, 32);
+    hitbox.setVisible(true); // Make the hitbox visible for debugging
+    hitbox.body.allowGravity = false; // Prevent the hitbox from falling
+
+    // Disable the hitbox after a short delay
+    this.time.delayedCall(200, () => {
+        if (hitbox) {
+            hitbox.destroy(); // Destroy the hitbox
+        }
+        player.anims.play('idle'); // Play idle animation after attack
+    }, [], this);
+
+    return hitbox;
+}
 </script>
 
 </body>
