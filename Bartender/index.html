@@ -46,6 +46,7 @@ var scoreText;
 direction = "right";
 var hitbox;
 
+
 var game = new Phaser.Game(config);
 
 function preload ()
@@ -56,6 +57,7 @@ function preload ()
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
     this.load.audio('backgroundMusic', 'assets/soundtrack.wav');  // Load the background music
+    this.load.audio('whoosh', 'assets/whoosh.wav'); // Load the whoosh sound
 }
 
 function create ()
@@ -135,6 +137,7 @@ function create ()
 
         // Add and play the background music
     var music = this.sound.add('backgroundMusic');
+    
     music.play({
         loop: true
     });
@@ -199,6 +202,8 @@ function update ()
     }
     else if ((cursors.down.isDown)&&(direction == "left"))
     {
+        var whoosh = this.sound.add('whoosh');
+        whoosh.play()
         player.setVelocityX(0);
         player.anims.play('attack2', true);
 
