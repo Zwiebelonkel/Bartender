@@ -73,15 +73,15 @@ function create ()
 
     // Spawn the enemy when counter reaches 10
     this.time.addEvent({
-        delay: 11000, // Delay 11 seconds to ensure the enemy spawns after the hitbox
-        callback: () => {
-            if (!enemySpawned) {
-                spawnEnemy(this, 0, 0);
-                enemySpawned = true;
-            }
-        },
-        loop: false
-    });
+    delay: Phaser.Math.Between(5000, 10000), // Random delay between 5 and 10 seconds (in milliseconds)
+    callback: () => {
+        if (!enemySpawned) {
+            spawnEnemy(this, 0, 0);
+            enemySpawned = true;
+        }
+    },
+    loop: false
+});
 
     // The player and its settings
     player = this.physics.add.sprite(300, 450, 'dude');
@@ -247,7 +247,7 @@ function spawnEnemy(scene, x, y){
     scene.anims.create({
         key: 'bottle_anim',
         frames: scene.anims.generateFrameNumbers('movingObject', { start: 0, end: 3 }), // Anpassen der Start- und Endnummern je nach Spritesheet
-        frameRate: 8,
+        frameRate: 16,
         repeat: -1
     });
     movingObject.anims.play('bottle_anim', true); // Animation abspielen
