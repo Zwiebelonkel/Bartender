@@ -53,8 +53,8 @@ function preload ()
 {
     this.load.image('bg', 'assets/bg.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('movingObject', 'assets/object.png'); 
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('movingObject', 'assets/bottle.png', { frameWidth: 32, frameHeight: 32 }); // Laden des Spritesheets für die Flasche
     this.load.audio('backgroundMusic', 'assets/soundtrack.wav');  // Load the background music
     this.load.audio('whoosh', 'assets/whoosh.wav'); // Load the whoosh sound
 }
@@ -85,7 +85,6 @@ function create ()
 
     // The player and its settings
     player = this.physics.add.sprite(300, 450, 'dude');
-    // movingObject = this.physics.add.sprite(300,400, "movingObject");
 
     // Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.3);
@@ -128,13 +127,6 @@ function create ()
         repeat: 0
     });
 
-    this.anims.create({
-        key: 'attack2',
-        frames: this.anims.generateFrameNumbers('dude', { start: 15, end: 15 }),
-        frameRate: 1,
-        repeat: 0
-    });
-
     // Play the idle animation initially
     player.anims.play('idle');
 
@@ -142,7 +134,7 @@ function create ()
     cursors = this.input.keyboard.createCursorKeys();
     
 
-        // Add and play the background music
+    // Add and play the background music
     var music = this.sound.add('backgroundMusic');
     
     music.play({
@@ -157,10 +149,6 @@ function create ()
 
     // Collide the player with the platforms
     this.physics.add.collider(player, platforms);
-
-
-    // Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, movingObject, handleCollision, null, this);
 
     // Timer event to increment the counter every second
     this.time.addEvent({
@@ -198,7 +186,6 @@ function update ()
         player.anims.play('attack1', true);
 
         let hitbox = createHitbox.call(this, player.x + 200, player.y).setScale(5);
-
     }
     else if ((cursors.down.isDown)&&(direction == "left"))
     {
@@ -241,6 +228,11 @@ function createHitbox(x, y) {
         player.anims.play('idle'); // Play idle animation after attack
     }, [], this);
 
+    // Add overlap check between hitbox and movingObject
+    if (movingObject) {
+        this.physics.add.overlap(hitbox, movingObject, handleCollision, null, this);
+    }
+
     return hitbox;
 }
 
@@ -249,6 +241,22 @@ function spawnEnemy(scene, x, y){
     movingObject.body.allowGravity = false; // Make sure the object doesn't fall down
     movingObject.setCollideWorldBounds(false); // Make sure the object collides with world bounds
     movingObject.setVelocityX(300); 
+    movingObject.setScale(5); // Anpassen der Größe je nach Spritesheet
+
+    // Animation hinzufügen
+    scene.anims.create({
+        key: 'bottle_anim',
+        frames: scene.anims.generateFrameNumbers('movingObject', { start: 0, end: 3 }), // Anpassen der Start- und Endnummern je nach Spritesheet
+        frameRate: 8,
+        repeat: -1
+    });
+    movingObject.anims.play('bottle_anim', true); // Animation abspielen
+
+    // Add overlap check between hitbox and movingObject
+    if (hitbox) {
+        scene.physics.add.overlap(hitbox, movingObject, handleCollision, null, scene);
+    }
+
     return movingObject;
 }
 
@@ -262,26 +270,6 @@ function handleCollision(hitbox, movingObject) {
     console.log('Enemy destroyed!');
 }
 
-function createHitbox(x, y) {
-    // Destroy existing hitbox if it exists
-    if (hitbox) {
-        hitbox.destroy();
-    }
-
-    hitbox = this.physics.add.sprite(x, y, null).setSize(32, 32);
-    hitbox.setVisible(true); // Make the hitbox visible for debugging
-    hitbox.body.allowGravity = false; // Prevent the hitbox from falling
-
-    // Disable the hitbox after a short delay
-    this.time.delayedCall(200, () => {
-        if (hitbox) {
-            hitbox.destroy(); // Destroy the hitbox
-        }
-        player.anims.play('idle'); // Play idle animation after attack
-    }, [], this);
-
-    return hitbox;
-}
 </script>
 </body>
 </html>
