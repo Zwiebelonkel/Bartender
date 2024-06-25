@@ -91,7 +91,6 @@ class GameScene extends Phaser.Scene {
         this.time.addEvent({
             delay: 1000,
             callback: () => {
-                console.log('Current min:', this.currentMin); // Debug-Ausgabe von min
                 this.incrementCounter(); // Zähler inkrementieren
             },
             callbackScope: this,
@@ -169,7 +168,7 @@ class GameScene extends Phaser.Scene {
         this.movingObject.setCollideWorldBounds(false);
         this.movingObject.setVelocityX(300 + difficulty); // Geschwindigkeit basierend auf der Schwierigkeit
         this.movingObject.setScale(5);
-        console.log(this.movingObject.body.velocity.x);
+        console.log("Bottle Velocity: "+this.movingObject.body.velocity.x);
     
         scene.anims.create({
             key: 'bottle_anim',
