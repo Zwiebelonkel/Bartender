@@ -162,26 +162,31 @@ class GameScene extends Phaser.Scene {
 
     // Spawning des Feindes
     spawnEnemy(scene, x, y) {
+        var difficulty = this.counter / 2; // Schwierigkeit basierend auf dem Zähler
+    
         this.movingObject = scene.physics.add.sprite(x, 500, 'movingObject');
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
-        this.movingObject.setVelocityX(300);
+        this.movingObject.setVelocityX(300 + difficulty); // Geschwindigkeit basierend auf der Schwierigkeit
         this.movingObject.setScale(5);
-
+        console.log(this.movingObject.body.velocity.x);
+    
         scene.anims.create({
             key: 'bottle_anim',
             frames: scene.anims.generateFrameNumbers('movingObject', { start: 0, end: 3 }),
-            frameRate: 16,
+            frameRate: 10,
             repeat: -1
         });
         this.movingObject.anims.play('bottle_anim', true);
-
+    
+        // Überlappung hinzufügen, wenn eine Hitbox existiert
         if (this.hitbox) {
             scene.physics.add.overlap(this.hitbox, this.movingObject, this.handleCollision, null, scene);
         }
-
+    
         return this.movingObject;
     }
+    
 
     // Zähler erhöhen
     incrementCounter() {

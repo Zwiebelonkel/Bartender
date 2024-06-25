@@ -1,0 +1,11 @@
+{
+  "name": "bartender",
+  "version": "1.0.0",
+  "description": "BeatEmUp",
+  "main": "index.html",
+  "scripts": {
+    "test": "start index.html"
+  },
+  "author": "",
+  "license": "ISC"
+}
