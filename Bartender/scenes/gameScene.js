@@ -142,7 +142,7 @@ class GameScene extends Phaser.Scene {
         }
 
         this.hitbox = this.physics.add.sprite(x, y, null).setSize(32, 32);
-        this.hitbox.setVisible(true);
+        this.hitbox.setVisible(false);
         this.hitbox.body.allowGravity = false;
 
         this.time.delayedCall(200, () => {
