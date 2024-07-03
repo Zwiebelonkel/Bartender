@@ -220,7 +220,7 @@ class GameScene extends Phaser.Scene {
 
     // Kollision behandeln
     handleCollision(hitbox, movingObject) {
-        if (movingObject.body.velocityX > 0) {
+        if (this.direction == 'left') {
             movingObject.setVelocityX(-500);
         } else {
             movingObject.setVelocityX(500);
@@ -251,4 +251,4 @@ class GameScene extends Phaser.Scene {
     }
 }
 
-export default GameScene;
+export default GameScene
