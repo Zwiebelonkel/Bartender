@@ -162,13 +162,17 @@ class GameScene extends Phaser.Scene {
     // Spawning des Feindes
     spawnEnemy(scene, x, y) {
         var difficulty = this.counter / 2; // Schwierigkeit basierend auf dem Zähler
+        var spawnDirection = Phaser.Math.Between(0, 1); // Zufällige Richtung (0 = links, 1 = rechts)
     
-        this.movingObject = scene.physics.add.sprite(x, 500, 'movingObject');
+        var xPos = spawnDirection === 0 ? 0 : 1000; // Startposition basierend auf der Richtung
+        var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty); // Geschwindigkeit basierend auf der Richtung und Schwierigkeit
+    
+        this.movingObject = scene.physics.add.sprite(xPos, 500, 'movingObject');
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
-        this.movingObject.setVelocityX(300 + difficulty); // Geschwindigkeit basierend auf der Schwierigkeit
+        this.movingObject.setVelocityX(velocityX); // Geschwindigkeit festlegen
         this.movingObject.setScale(5);
-        console.log("Bottle Velocity: "+this.movingObject.body.velocity.x);
+        console.log("Bottle Velocity: " + this.movingObject.body.velocity.x);
     
         scene.anims.create({
             key: 'bottle_anim',
