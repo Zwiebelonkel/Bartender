@@ -7,7 +7,8 @@ class GameScene extends Phaser.Scene {
         this.load.image('bg', 'assets/bg.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet('movingObject', 'assets/bottle.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('bottle', 'assets/bottle.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('enemy', 'assets/enemy.png', { frameWidth: 32, frameHeight: 32 });
         this.load.audio('backgroundMusic', 'assets/soundtrack.wav');
         this.load.audio('whoosh', 'assets/whoosh.wav');
     }
@@ -19,6 +20,8 @@ class GameScene extends Phaser.Scene {
         // Festlegung von Startwerten für min und max
         this.initialMin = 5000;
         this.initialMax = 10000;
+        this.minSpawnDelay = 5000;
+        this.maxSpawnDelay = 10000;
 
         // Deklaration und Initialisierung der platforms
         this.platforms = this.physics.add.staticGroup();
@@ -26,6 +29,7 @@ class GameScene extends Phaser.Scene {
 
         // Zeitverzögertes Event zum Spawnen des Feindes mit festem Startintervall
         this.spawnEnemyEvent();
+        this.spawnBottleEvent();
 
         // Spieler-Charakter
         this.player = this.physics.add.sprite(300, 450, 'dude');
@@ -183,33 +187,86 @@ class GameScene extends Phaser.Scene {
     spawnEnemy(scene, x, y) {
         var difficulty = this.counter / 2;
         var spawnDirection = Phaser.Math.Between(0, 1);
-
+    
         var xPos = spawnDirection === 0 ? 0 : 1000;
         var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty);
-
-        this.movingObject = scene.physics.add.sprite(xPos, 500, 'movingObject');
+    
+        this.movingObject = scene.physics.add.sprite(xPos, 600, 'movingObject');
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
         this.movingObject.setVelocityX(velocityX);
-        this.movingObject.setScale(5);
+        this.movingObject.setScale(10);
+    
+        console.log("Enemy Velocity: " + this.movingObject.body.velocity.x);
+        console.log("minSpawn: " + this.minSpawnDelay)
+        console.log("maxSpawn: " + this.maxSpawnDelay)
+        this.minSpawnDelay = this.minSpawnDelay /1.01
+        this.maxSpawnDelay = this.maxSpawnDelay /1.01
 
-        console.log("Bottle Velocity: " + this.movingObject.body.velocity.x);
 
-        scene.anims.create({
-            key: 'bottle_anim',
-            frames: scene.anims.generateFrameNumbers('movingObject', { start: 0, end: 3 }),
-            frameRate: 10,
-            repeat: -1
-        });
-        this.movingObject.anims.play('bottle_anim', true);
 
+    
+        // Überprüfen, ob die Animation bereits existiert
+        if (!scene.anims.get('enemy_anim')) {
+            // Animation erstellen, wenn sie nicht existiert
+            scene.anims.create({
+                key: 'enemy_anim',
+                frames: scene.anims.generateFrameNumbers('enemy', { start: 0, end: 4 }),
+                frameRate: 10,
+                repeat: -1
+            });
+        }
+    
+        // Animation auf dem Sprite anwenden und spiegeln
+        this.movingObject.anims.play('enemy_anim', true);
+        if (spawnDirection === 1) {
+            this.movingObject.flipX = true;
+        }
+    
+        // Überlappung der Hitbox und Kollision mit dem Spieler hinzufügen
         if (this.hitbox) {
             scene.physics.add.overlap(this.hitbox, this.movingObject, this.handleCollision, null, scene);
         }
-
+    
         this.physics.add.overlap(this.player, this.movingObject, this.playerHit, null, this);
-
+    
         return this.movingObject;
+    }
+
+    // Spawning der Flasche
+    spawnBottle(scene, x, y) {
+        var difficulty = this.counter / 2;
+
+        // Festlegen der Startposition der Flasche am oberen Bildschirmrand
+        var xPos = Phaser.Math.Between(0, scene.sys.canvas.width);
+        var yPos = 0;
+
+        // Geschwindigkeit der Flasche von oben nach unten
+        var velocityX = 0;
+        var velocityY = 200 + difficulty; // Schneller als der Feind, aber langsamer als der Spieler
+
+        this.bottle = scene.physics.add.sprite(xPos, yPos, 'bottle');
+        this.bottle.body.allowGravity = false;
+        this.bottle.setCollideWorldBounds(false);
+        this.bottle.setVelocity(velocityX, velocityY);
+        this.bottle.setScale(5);
+
+        console.log("Bottle Velocity: "+ this.bottle.body.velocity.y);
+
+        if (!scene.anims.get('bottle')) {
+            // Animation erstellen, wenn sie nicht existiert
+            scene.anims.create({
+                key: 'bottle',
+                frames: scene.anims.generateFrameNumbers('bottle', { start: 0, end: 3 }),
+                frameRate: 10,
+                repeat: -1
+            });
+        }
+
+        // Kollision des Spielers mit der Flasche überwachen
+        this.physics.add.overlap(this.player, this.bottle, this.playerHit, null, this);
+
+        return this.bottle;
     }
 
     // Zähler erhöhen
@@ -230,8 +287,10 @@ class GameScene extends Phaser.Scene {
     }
 
     // Spieler-Kollision behandeln
-    playerHit(player, movingObject) {
-        if (Math.abs(player.x - movingObject.x) < 10) {
+    playerHit(player, object) {
+        if (object === this.movingObject && Math.abs(player.x - object.x) < 10) {
+            this.scene.start('GameOver');
+        } else if (object === this.bottle && Math.abs(player.x - object.x) < 10) {
             this.scene.start('GameOver');
         }
     }
@@ -239,16 +298,26 @@ class GameScene extends Phaser.Scene {
     // Zeitereignis für das Spawnen des Feindes
     spawnEnemyEvent() {
         this.time.addEvent({
-            delay: Phaser.Math.Between(this.initialMin, this.initialMax),
+            delay: Phaser.Math.Between(this.minSpawnDelay, this.maxSpawnDelay),
             callback: () => {
                 this.spawnEnemy(this, Phaser.Math.Between(0, 1000), Phaser.Math.Between(0, 500));
-                this.initialMin = Math.max(500, this.initialMin - 500);
-                this.initialMax = Math.max(1000, this.initialMax - 500);
                 this.spawnEnemyEvent();
+            },
+            callbackScope: this
+        });
+    }
+
+    // Zeitereignis für das Spawnen der Flasche
+    spawnBottleEvent() {
+        this.time.addEvent({
+            delay: Phaser.Math.Between(10000, 15000),
+            callback: () => {
+                this.spawnBottle(this, Phaser.Math.Between(0, 1000), Phaser.Math.Between(0, 500));
+                this.spawnBottleEvent();
             },
             callbackScope: this
         });
     }
 }
 
-export default GameScene
+export default GameScene;
