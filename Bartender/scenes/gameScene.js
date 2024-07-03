@@ -33,6 +33,9 @@ class GameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setScale(10);
 
+        // Hitbox des Spielers anpassen (falls zu groß)
+        this.player.setSize(32, 32).setOffset(0, 0);
+
         // Animationen für den Spieler-Charakter
         this.anims.create({
             key: 'left',
@@ -96,6 +99,11 @@ class GameScene extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+
+        // Debug-Ansicht der Hitboxen einschalten
+        this.physics.world.createDebugGraphic();
+        this.debugGraphics = this.add.graphics();
+        this.debugGraphics.lineStyle(2, 0xff00ff, 1);
     }
 
     update() {
@@ -133,6 +141,18 @@ class GameScene extends Phaser.Scene {
         if (this.cursors.up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-500);
         }
+
+        // Überprüfung der Kollision basierend auf der x-Koordinate
+        if (this.movingObject && Math.abs(this.player.x - this.movingObject.x) < 10) {
+            this.scene.start('GameOver');
+        }
+
+        // Hitboxen debuggen
+        this.debugGraphics.clear();
+        this.debugGraphics.strokeRectShape(this.player.getBounds());
+        if (this.movingObject) {
+            this.debugGraphics.strokeRectShape(this.movingObject.getBounds());
+        }
     }
 
     // Erstellen einer Hitbox
@@ -161,19 +181,20 @@ class GameScene extends Phaser.Scene {
 
     // Spawning des Feindes
     spawnEnemy(scene, x, y) {
-        var difficulty = this.counter / 2; // Schwierigkeit basierend auf dem Zähler
-        var spawnDirection = Phaser.Math.Between(0, 1); // Zufällige Richtung (0 = links, 1 = rechts)
-    
-        var xPos = spawnDirection === 0 ? 0 : 1000; // Startposition basierend auf der Richtung
-        var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty); // Geschwindigkeit basierend auf der Richtung und Schwierigkeit
-    
+        var difficulty = this.counter / 2;
+        var spawnDirection = Phaser.Math.Between(0, 1);
+
+        var xPos = spawnDirection === 0 ? 0 : 1000;
+        var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty);
+
         this.movingObject = scene.physics.add.sprite(xPos, 500, 'movingObject');
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
-        this.movingObject.setVelocityX(velocityX); // Geschwindigkeit festlegen
+        this.movingObject.setVelocityX(velocityX);
         this.movingObject.setScale(5);
+
         console.log("Bottle Velocity: " + this.movingObject.body.velocity.x);
-    
+
         scene.anims.create({
             key: 'bottle_anim',
             frames: scene.anims.generateFrameNumbers('movingObject', { start: 0, end: 3 }),
@@ -181,15 +202,15 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
         this.movingObject.anims.play('bottle_anim', true);
-    
-        // Überlappung hinzufügen, wenn eine Hitbox existiert
+
         if (this.hitbox) {
             scene.physics.add.overlap(this.hitbox, this.movingObject, this.handleCollision, null, scene);
         }
-    
+
+        this.physics.add.overlap(this.player, this.movingObject, this.playerHit, null, this);
+
         return this.movingObject;
     }
-    
 
     // Zähler erhöhen
     incrementCounter() {
@@ -199,8 +220,20 @@ class GameScene extends Phaser.Scene {
 
     // Kollision behandeln
     handleCollision(hitbox, movingObject) {
-        movingObject.setVelocityX(-500);
+        if (movingObject.body.velocityX > 0) {
+            movingObject.setVelocityX(-500);
+        } else {
+            movingObject.setVelocityX(500);
+        }
+
         console.log('Enemy destroyed!');
+    }
+
+    // Spieler-Kollision behandeln
+    playerHit(player, movingObject) {
+        if (Math.abs(player.x - movingObject.x) < 10) {
+            this.scene.start('GameOver');
+        }
     }
 
     // Zeitereignis für das Spawnen des Feindes
@@ -208,22 +241,13 @@ class GameScene extends Phaser.Scene {
         this.time.addEvent({
             delay: Phaser.Math.Between(this.initialMin, this.initialMax),
             callback: () => {
-                this.spawnEnemy(this, 0, 0);
-                this.updateSpawnDelay();
+                this.spawnEnemy(this, Phaser.Math.Between(0, 1000), Phaser.Math.Between(0, 500));
+                this.initialMin = Math.max(500, this.initialMin - 500);
+                this.initialMax = Math.max(1000, this.initialMax - 500);
+                this.spawnEnemyEvent();
             },
-            callbackScope: this,
-            loop: true
+            callbackScope: this
         });
-    }
-
-    // Aktualisierung der Verzögerung für das Spawnen des Feindes
-    updateSpawnDelay() {
-        var difficulty = this.counter / 2;
-        this.currentMin = Math.max(1000, this.initialMin - difficulty);
-        this.currentMax = Math.max(5000, this.initialMax - difficulty);
-
-        console.log('Updated min:', this.currentMin); // Debug-Ausgabe für die Aktualisierung von min
-        console.log('Updated max:', this.currentMax); // Debug-Ausgabe für die Aktualisierung von max
     }
 }
 
