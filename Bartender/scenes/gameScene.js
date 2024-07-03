@@ -1,9 +1,12 @@
+// const fs = require('fs');
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.isWhooshPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
         this.isJumpPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
         this.isPunchPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
+        this.highscoreFile = 'highscore.txt';
     }
 
     preload() {
@@ -21,6 +24,7 @@ class GameScene extends Phaser.Scene {
     create() {
         this.add.image(500, 375, 'bg');
         this.counter = 0;
+        this.score = 0;
 
         // Festlegung von Startwerten für min und max
         this.initialMin = 5000;
@@ -169,8 +173,7 @@ class GameScene extends Phaser.Scene {
 
         // Überprüfung der Kollision basierend auf der x-Koordinate
         if (this.movingObject && Math.abs(this.player.x - this.movingObject.x) < 10) {
-            this.stopMusic();
-            this.scene.start('GameOver');
+            this.GameOver();
         }
 
 
@@ -296,7 +299,7 @@ class GameScene extends Phaser.Scene {
     // Zähler erhöhen
     incrementCounter() {
         this.counter++;
-        this.counterText.setText('Points: ' + this.counter);
+        this.counterText.setText('Time: ' + this.counter);
     }
 
     // Kollision behandeln
@@ -311,18 +314,43 @@ class GameScene extends Phaser.Scene {
             punch.play();
             this.isPunchPlaying = true;
         }
-
+        this.score += 10
+        this.scoreText.setText('Score: ' + this.score);
         console.log('Enemy destroyed!');
     }
 
     // Spieler-Kollision behandeln
     playerHit(player, object) {
         if (object === this.movingObject && Math.abs(player.x - object.x) < 10) {
-            this.stopMusic();
-            this.scene.start('GameOver');
+            this.GameOver();
         } else if (object === this.bottle && Math.abs(player.x - object.x) < 20) {
-            this.stopMusic();
-            this.scene.start('GameOver');
+            this.GameOver();
+
+        }
+    }
+
+    GameOver() {
+        this.stopMusic();
+        this.scoreText = this.counterText + this.scoreText
+        // this.saveHighscore();
+        this.scene.start('GameOver');
+    }
+
+    saveHighscore() {
+        const currentHighscore = this.counter;
+
+        // Lesen der aktuellen Highscore aus der Datei (falls vorhanden)
+        let existingHighscore = 0;
+        if (fs.existsSync(this.highscoreFile)) {
+            existingHighscore = parseInt(fs.readFileSync(this.highscoreFile, 'utf8'));
+        }
+
+        // Vergleichen und aktualisieren, falls der neue Highscore höher ist
+        if (currentHighscore > existingHighscore) {
+            fs.writeFileSync(this.highscoreFile, currentHighscore.toString(), 'utf8');
+            console.log('Highscore aktualisiert:', currentHighscore);
+        } else {
+            console.log('Kein neuer Highscore erreicht.');
         }
     }
 
