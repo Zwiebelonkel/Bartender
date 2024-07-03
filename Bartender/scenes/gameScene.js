@@ -110,9 +110,9 @@ class GameScene extends Phaser.Scene {
         });
 
         // Debug-Ansicht der Hitboxen einschalten
-        this.physics.world.createDebugGraphic();
-        this.debugGraphics = this.add.graphics();
-        this.debugGraphics.lineStyle(2, 0xff00ff, 1);
+        // this.physics.world.createDebugGraphic();
+        // this.debugGraphics = this.add.graphics();
+        // this.debugGraphics.lineStyle(2, 0xff00ff, 1);
     }
 
     update() {
@@ -169,17 +169,20 @@ class GameScene extends Phaser.Scene {
 
         // Überprüfung der Kollision basierend auf der x-Koordinate
         if (this.movingObject && Math.abs(this.player.x - this.movingObject.x) < 10) {
+            this.stopMusic();
             this.scene.start('GameOver');
         }
 
+
+    }
         // Hitboxen debuggen
+        debugger() {
         this.debugGraphics.clear();
         this.debugGraphics.strokeRectShape(this.player.getBounds());
         if (this.movingObject) {
             this.debugGraphics.strokeRectShape(this.movingObject.getBounds());
         }
     }
-
     // Erstellen einer Hitbox
     createHitbox(x, y) {
         if (this.hitbox) {
