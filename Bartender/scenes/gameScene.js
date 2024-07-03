@@ -1,6 +1,9 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
+        this.isWhooshPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
+        this.isJumpPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
+        this.isPunchPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
     }
 
     preload() {
@@ -11,6 +14,8 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('enemy', 'assets/enemy.png', { frameWidth: 32, frameHeight: 32 });
         this.load.audio('backgroundMusic', 'assets/soundtrack.wav');
         this.load.audio('whoosh', 'assets/whoosh.wav');
+        this.load.audio('jump', 'assets/jump.wav');
+        this.load.audio('punch', 'assets/punch.wav');
     }
 
     create() {
@@ -128,22 +133,38 @@ class GameScene extends Phaser.Scene {
             this.player.setVelocityX(0);
             this.player.anims.play('attack1', true);
             let hitbox = this.createHitbox(this.player.x + 200, this.player.y).setScale(5);
+            if (!this.isWhooshPlaying) {
+                var whoosh = this.sound.add('whoosh');
+                whoosh.play();
+                this.isWhooshPlaying = true;
+            }
         } else if ((this.cursors.down.isDown) && (this.direction == "left")) {
-            var whoosh = this.sound.add('whoosh');
-            whoosh.play();
             this.player.setVelocityX(0);
             this.player.anims.play('attack2', true);
             let hitbox = this.createHitbox(this.player.x - 200, this.player.y).setScale(5);
+            if (!this.isWhooshPlaying) {
+                var whoosh = this.sound.add('whoosh');
+                whoosh.play();
+                this.isWhooshPlaying = true;
+            }
         } else {
             this.player.setVelocityX(0);
             if (!this.player.anims.currentAnim || this.player.anims.currentAnim.key !== 'idle') {
                 this.player.anims.play('idle', true);
             }
+            this.isWhooshPlaying = false; // Reset der whoosh-Sound-Variable
+            this.isjumpPlaying = false; // Reset der whoosh-Sound-Variable
+            this.isPunchPlaying = false; // Reset der whoosh-Sound-Variable
         }
 
         // Sprung
         if (this.cursors.up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-500);
+            if (!this.isjumpPlaying) {
+                var jump = this.sound.add('jump');
+                jump.play();
+                this.isjumpPlaying = true;
+            }
         }
 
         // Überprüfung der Kollision basierend auf der x-Koordinate
@@ -187,25 +208,22 @@ class GameScene extends Phaser.Scene {
     spawnEnemy(scene, x, y) {
         var difficulty = this.counter / 2;
         var spawnDirection = Phaser.Math.Between(0, 1);
-    
+
         var xPos = spawnDirection === 0 ? 0 : 1000;
         var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty);
-    
-        this.movingObject = scene.physics.add.sprite(xPos, 600, 'movingObject');
+
+        this.movingObject = scene.physics.add.sprite(xPos, 600, 'enemy'); // Richtiges Spritesheet verwenden
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
         this.movingObject.setVelocityX(velocityX);
         this.movingObject.setScale(10);
-    
+
         console.log("Enemy Velocity: " + this.movingObject.body.velocity.x);
         console.log("minSpawn: " + this.minSpawnDelay)
         console.log("maxSpawn: " + this.maxSpawnDelay)
-        this.minSpawnDelay = this.minSpawnDelay /1.01
-        this.maxSpawnDelay = this.maxSpawnDelay /1.01
+        this.minSpawnDelay = this.minSpawnDelay / 1.01
+        this.maxSpawnDelay = this.maxSpawnDelay / 1.01
 
-
-
-    
         // Überprüfen, ob die Animation bereits existiert
         if (!scene.anims.get('enemy_anim')) {
             // Animation erstellen, wenn sie nicht existiert
@@ -216,20 +234,20 @@ class GameScene extends Phaser.Scene {
                 repeat: -1
             });
         }
-    
+
         // Animation auf dem Sprite anwenden und spiegeln
         this.movingObject.anims.play('enemy_anim', true);
         if (spawnDirection === 1) {
             this.movingObject.flipX = true;
         }
-    
+
         // Überlappung der Hitbox und Kollision mit dem Spieler hinzufügen
         if (this.hitbox) {
             scene.physics.add.overlap(this.hitbox, this.movingObject, this.handleCollision, null, scene);
         }
-    
+
         this.physics.add.overlap(this.player, this.movingObject, this.playerHit, null, this);
-    
+
         return this.movingObject;
     }
 
@@ -251,7 +269,7 @@ class GameScene extends Phaser.Scene {
         this.bottle.setVelocity(velocityX, velocityY);
         this.bottle.setScale(5);
 
-        console.log("Bottle Velocity: "+ this.bottle.body.velocity.y);
+        console.log("Bottle Velocity: " + this.bottle.body.velocity.y);
 
         if (!scene.anims.get('bottle')) {
             // Animation erstellen, wenn sie nicht existiert
@@ -262,6 +280,9 @@ class GameScene extends Phaser.Scene {
                 repeat: -1
             });
         }
+
+        // Animation auf dem Sprite anwenden
+        this.bottle.anims.play('bottle', true);
 
         // Kollision des Spielers mit der Flasche überwachen
         this.physics.add.overlap(this.player, this.bottle, this.playerHit, null, this);
@@ -282,6 +303,11 @@ class GameScene extends Phaser.Scene {
         } else {
             movingObject.setVelocityX(500);
         }
+        if (!this.isPunchPlaying) {
+            var punch = this.sound.add('punch');
+            punch.play();
+            this.isPunchPlaying = true;
+        }
 
         console.log('Enemy destroyed!');
     }
@@ -289,8 +315,10 @@ class GameScene extends Phaser.Scene {
     // Spieler-Kollision behandeln
     playerHit(player, object) {
         if (object === this.movingObject && Math.abs(player.x - object.x) < 10) {
+            this.stopMusic();
             this.scene.start('GameOver');
-        } else if (object === this.bottle && Math.abs(player.x - object.x) < 10) {
+        } else if (object === this.bottle && Math.abs(player.x - object.x) < 20) {
+            this.stopMusic();
             this.scene.start('GameOver');
         }
     }
@@ -318,6 +346,14 @@ class GameScene extends Phaser.Scene {
             callbackScope: this
         });
     }
+
+    stopMusic() {
+        if (this.music.isPlaying) {
+            this.music.stop();
+        }
+    }
 }
+
+
 
 export default GameScene;
