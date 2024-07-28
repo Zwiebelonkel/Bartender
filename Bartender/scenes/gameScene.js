@@ -1,5 +1,3 @@
-// const fs = require('fs');
-
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
@@ -7,6 +5,7 @@ class GameScene extends Phaser.Scene {
         this.isJumpPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
         this.isPunchPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
         this.highscoreFile = 'highscore.txt';
+        this.lives = 3; // Spieler startet mit 3 Leben
     }
 
     preload() {
@@ -99,6 +98,7 @@ class GameScene extends Phaser.Scene {
         // Punkteanzeige
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
         this.counterText = this.add.text(16, 48, 'Time: 0', { fontSize: '32px', fill: '#000' });
+        this.livesText = this.add.text(16, 80, 'Lives: 3', { fontSize: '32px', fill: '#000' }); // Lebensanzeige
 
         // Kollision zwischen Spieler und Plattformen
         this.physics.add.collider(this.player, this.platforms);
@@ -173,19 +173,19 @@ class GameScene extends Phaser.Scene {
 
         // Überprüfung der Kollision basierend auf der x-Koordinate
         if (this.movingObject && Math.abs(this.player.x - this.movingObject.x) < 10) {
-            this.GameOver();
+            this.playerHit();
         }
-
-
     }
-        // Hitboxen debuggen
-        debugger() {
+
+    // Hitboxen debuggen
+    debugger() {
         this.debugGraphics.clear();
         this.debugGraphics.strokeRectShape(this.player.getBounds());
         if (this.movingObject) {
             this.debugGraphics.strokeRectShape(this.movingObject.getBounds());
         }
     }
+
     // Erstellen einer Hitbox
     createHitbox(x, y) {
         if (this.hitbox) {
@@ -260,7 +260,6 @@ class GameScene extends Phaser.Scene {
     // Spawning der Flasche
     spawnBottle(scene, x, y) {
         var difficulty = this.counter / 2;
-
         // Festlegen der Startposition der Flasche am oberen Bildschirmrand
         var xPos = Phaser.Math.Between(0, scene.sys.canvas.width);
         var yPos = 0;
@@ -322,10 +321,17 @@ class GameScene extends Phaser.Scene {
     // Spieler-Kollision behandeln
     playerHit(player, object) {
         if (object === this.movingObject && Math.abs(player.x - object.x) < 10) {
-            this.GameOver();
+            this.lives--;
+            this.livesText.setText('Lives: ' + this.lives); // Lebensanzeige aktualisieren
+            if (this.lives <= 0) {
+                this.GameOver();
+            }
         } else if (object === this.bottle && Math.abs(player.x - object.x) < 20) {
-            this.GameOver();
-
+            this.lives--;
+            this.livesText.setText('Lives: ' + this.lives); // Lebensanzeige aktualisieren
+            if (this.lives <= 0) {
+                this.GameOver();
+            }
         }
     }
 
@@ -384,7 +390,5 @@ class GameScene extends Phaser.Scene {
         }
     }
 }
-
-
 
 export default GameScene;
