@@ -6,7 +6,6 @@ class GameScene extends Phaser.Scene {
         this.isWhooshPlaying = false;
         this.isJumpPlaying = false;
         this.isPunchPlaying = false;
-        this.highscoreFile = 'highscore.txt';
         this.lives = 3;
         this.score = GlobalSettings.money;
         this.playerJumpHeight = -500;
@@ -409,26 +408,7 @@ class GameScene extends Phaser.Scene {
     GameOver() {
         this.stopMusic();
         this.scoreText = this.counterText + this.scoreText
-        // this.saveHighscore();
         this.scene.start('GameOver');
-    }
-
-    saveHighscore() {
-        const currentHighscore = this.counter;
-
-        // Lesen der aktuellen Highscore aus der Datei (falls vorhanden)
-        let existingHighscore = 0;
-        if (fs.existsSync(this.highscoreFile)) {
-            existingHighscore = parseInt(fs.readFileSync(this.highscoreFile, 'utf8'));
-        }
-
-        // Vergleichen und aktualisieren, falls der neue Highscore höher ist
-        if (currentHighscore > existingHighscore) {
-            fs.writeFileSync(this.highscoreFile, currentHighscore.toString(), 'utf8');
-            console.log('Highscore aktualisiert:', currentHighscore);
-        } else {
-            console.log('Kein neuer Highscore erreicht.');
-        }
     }
 
     // Zeitereignis für das Spawnen des Feindes
