@@ -44,9 +44,9 @@ class DecorScene extends Phaser.Scene {
         this.displayPurchasedDecorations();
 
         // Dekorationsbuttons erstellen
-        this.createDecorButton('Sofa - $50', 100, 100, 'sofa', 50);
-        this.createDecorButton('Painting - $30', 100, 150, 'painting', 30);
-        this.createDecorButton('Lamp - $20', 100, 200, 'lamp', 20);
+        this.createDecorButton('Sofa - $4000', 100, 100, 'sofa', 4000);
+        this.createDecorButton('Painting - $3000', 100, 150, 'painting', 3000);
+        this.createDecorButton('Lamp - $2000', 100, 200, 'lamp', 2000);
 
         // Button zur ShopScene für Upgrades
         this.createUpgradeButton('Go to Work', 100, 300, () => this.goToShopScene());

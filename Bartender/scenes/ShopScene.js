@@ -20,9 +20,9 @@ class ShopScene extends Phaser.Scene {
         this.add.text(16, 16, 'Shop', { fontSize: '32px', fill: '#000' });
         this.moneyText = this.add.text(16, 48, `Money: ${this.score}`, { fontSize: '32px', fill: '#000' });
 
-        this.createUpgradeButton('More Lives', 100, 100, () => this.buyUpgrade('lives', 1, 10));
-        this.createUpgradeButton('Higher Jump', 100, 150, () => this.buyUpgrade('jump', -100, 50));
-        this.createUpgradeButton('More Speed', 100, 200, () => this.buyUpgrade('speed', 100, 50));
+        this.createUpgradeButton('More Lives - 500$', 100, 100, () => this.buyUpgrade('lives', 1, 500));
+        this.createUpgradeButton('Higher Jump - 2000$', 100, 150, () => this.buyUpgrade('jump', -100, 2000));
+        this.createUpgradeButton('More Speed - 1500$', 100, 200, () => this.buyUpgrade('speed', 100, 1500));
         this.createUpgradeButton('Back to Game', 100, 300, () => this.backToGame());
     }
 

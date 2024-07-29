@@ -38,7 +38,6 @@ class GameScene extends Phaser.Scene {
         // Deklaration und Initialisierung der platforms
         this.platforms = this.physics.add.staticGroup();
         this.platforms.create(1000, 825, 'ground').setScale(5).refreshBody();
-        this.platforms.create(600,500, 'ground').setScale(2.1, 1).refreshBody().setVisible(false);
 
         // Zeitverzögertes Event zum Spawnen des Feindes mit festem Startintervall
         this.spawnEnemyEvent();
@@ -119,7 +118,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 6000,
+            delay: 60000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
@@ -359,7 +358,7 @@ class GameScene extends Phaser.Scene {
             punch.play();
             this.isPunchPlaying = true;
         }
-        this.score += 10
+        this.score += 5
         this.scoreText.setText('Score: ' + this.score);
         console.log('Enemy destroyed!');
     }
@@ -376,7 +375,7 @@ class GameScene extends Phaser.Scene {
             punch.play();
             this.isPunchPlaying = true;
         }
-        this.score += 10
+        this.score += 2
         this.scoreText.setText('Score: ' + this.score);
         console.log('Bottle thrown!');
     }
