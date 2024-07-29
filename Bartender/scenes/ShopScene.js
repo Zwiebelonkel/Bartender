@@ -12,11 +12,11 @@ class ShopScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('bg', 'assets/bg.png');
+        this.load.image('shop', 'assets/shop.png');
     }
 
     create() {
-        this.add.image(400, 300, 'bg');
+        this.add.image(500, 375, 'shop');
         this.add.text(16, 16, 'Shop', { fontSize: '32px', fill: '#000' });
         this.moneyText = this.add.text(16, 48, `Money: ${this.score}`, { fontSize: '32px', fill: '#000' });
 
