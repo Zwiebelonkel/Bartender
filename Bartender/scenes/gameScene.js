@@ -137,6 +137,7 @@ class GameScene extends Phaser.Scene {
                 this.playerSpeed = data.playerSpeed || this.playerSpeed;
                 this.playerAttackRange = data.playerAttackRange || this.playerAttackRange;
                 this.livesText.setText('Lives: ' + this.lives);
+                
             }
         });
     }
@@ -348,6 +349,7 @@ class GameScene extends Phaser.Scene {
     playerHit(player, object) {
         if (object === this.movingObject && Math.abs(player.x - object.x) < 10) {
             this.lives--;
+            this.movingObject.destroy();
             this.livesText.setText('Lives: ' + this.lives); // Lebensanzeige aktualisieren
             if (this.lives <= 0) {
                 this.GameOver();
