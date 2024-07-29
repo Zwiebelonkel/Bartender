@@ -157,11 +157,11 @@ class GameScene extends Phaser.Scene {
 
         // Spieler-Steuerung
         if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-400);
+            this.player.setVelocityX(-this.playerSpeed);
             this.player.anims.play('left', true);
             this.direction = "left";
         } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(400);
+            this.player.setVelocityX(this.playerSpeed);
             this.player.anims.play('right', true);
             this.direction = "right";
         } else if ((this.cursors.down.isDown) && (this.direction == "right")) {
