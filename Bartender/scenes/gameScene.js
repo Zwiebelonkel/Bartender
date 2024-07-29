@@ -130,6 +130,8 @@ class GameScene extends Phaser.Scene {
         // this.debugGraphics.lineStyle(2, 0xff00ff, 1);
     }
 
+    
+
     update() {
         if (this.gameOver) {
             return;
