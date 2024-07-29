@@ -119,7 +119,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 30000,
+            delay: 3000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
@@ -450,7 +450,7 @@ class GameScene extends Phaser.Scene {
     }
 
     enterShop() {
-        this.scene.start('ShopScene', {
+        this.scene.start('DecorScene', {
             score: this.score+100000,
             lives: this.lives,
             playerJumpHeight: this.playerJumpHeight,

@@ -3,6 +3,7 @@ import GameScene from './scenes/gameScene.js';
 import GameOver from './scenes/gameOver.js';
 import Options from './scenes/optionScene.js';
 import ShopScene from './scenes/ShopScene.js';
+import DecorScene from './scenes/decorScene.js';
 
 
 var config = {
@@ -19,7 +20,7 @@ var config = {
     render: {
         pixelArt: true
     },
-    scene: [StartMenu, Options, GameScene, GameOver, ShopScene]
+    scene: [StartMenu, Options, GameScene, GameOver, ShopScene, DecorScene]
 };
 
 var game = new Phaser.Game(config);
