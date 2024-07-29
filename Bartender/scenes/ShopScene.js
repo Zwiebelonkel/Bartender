@@ -23,7 +23,6 @@ class ShopScene extends Phaser.Scene {
         this.createUpgradeButton('More Lives', 100, 100, () => this.buyUpgrade('lives', 1, 10));
         this.createUpgradeButton('Higher Jump', 100, 150, () => this.buyUpgrade('jump', -100, 50));
         this.createUpgradeButton('More Speed', 100, 200, () => this.buyUpgrade('speed', 100, 50));
-        this.createUpgradeButton('Longer Attack Range', 100, 250, () => this.buyUpgrade('range', 100, 50));
         this.createUpgradeButton('Back to Game', 100, 300, () => this.backToGame());
     }
 

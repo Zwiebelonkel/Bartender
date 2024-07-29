@@ -49,7 +49,7 @@ class DecorScene extends Phaser.Scene {
         this.createDecorButton('Lamp - $20', 100, 200, 'lamp', 20);
 
         // Button zur ShopScene für Upgrades
-        this.createUpgradeButton('Go to Upgrades', 100, 300, () => this.goToShopScene());
+        this.createUpgradeButton('Go to Work', 100, 300, () => this.goToShopScene());
 
         // Spieler-Charakter
         this.player = this.physics.add.sprite(300, 450, 'dude');

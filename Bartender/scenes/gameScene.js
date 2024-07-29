@@ -1,3 +1,5 @@
+import { GlobalSettings } from './globals.js';
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
@@ -30,10 +32,8 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
 
         // Festlegung von Startwerten für min und max
-        this.initialMin = 5000;
-        this.initialMax = 10000;
-        this.minSpawnDelay = 5000;
-        this.maxSpawnDelay = 10000;
+        this.minSpawnDelay = GlobalSettings.minSpawnDelay;
+        this.maxSpawnDelay = GlobalSettings.maxSpawnDelay;
 
         // Deklaration und Initialisierung der platforms
         this.platforms = this.physics.add.staticGroup();
@@ -119,7 +119,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 10000,
+            delay: 6000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
@@ -137,10 +137,13 @@ class GameScene extends Phaser.Scene {
                 this.playerJumpHeight = data.playerJumpHeight || this.playerJumpHeight;
                 this.playerSpeed = data.playerSpeed || this.playerSpeed;
                 this.playerAttackRange = data.playerAttackRange || this.playerAttackRange;
+                this.minSpawnDelay = data.minSpawnDelay || this.initialMin;
+                this.maxSpawnDelay = data.maxSpawnDelay || this.initialMax;
                 this.livesText.setText('Lives: ' + this.lives);
                 
             }
         });
+        
     }
 
     
@@ -151,10 +154,12 @@ class GameScene extends Phaser.Scene {
         this.playerJumpHeight = data.playerJumpHeight || this.playerJumpHeight;
         this.playerSpeed = data.playerSpeed || this.playerSpeed;
         this.playerAttackRange = data.playerAttackRange || this.playerAttackRange;
+        this.minSpawnDelay = data.minSpawnDelay || GlobalSettings.minSpawnDelay;
+        this.maxSpawnDelay = data.maxSpawnDelay || GlobalSettings.maxSpawnDelay;
     }
+
     update() {
         this.livesText.setText('Lives: ' + this.lives); // Lebensanzeige aktualisieren
-
         if (this.gameOver) {
             return;
         }
@@ -207,6 +212,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+
     // Hitboxen debuggen
     debugger() {
         this.debugGraphics.clear();
@@ -246,7 +252,9 @@ class GameScene extends Phaser.Scene {
 
     // Spawning des Feindes
     spawnEnemy(scene, x, y) {
-        var difficulty = this.counter / 2;
+        console.log("difficulty: "+difficulty)
+        var difficulty = GlobalSettings.difficulty+ this.counter / 2;
+        GlobalSettings.difficulty = difficulty;
         var spawnDirection = Phaser.Math.Between(0, 1);
 
         var xPos = spawnDirection === 0 ? 0 : 1000;
@@ -263,6 +271,8 @@ class GameScene extends Phaser.Scene {
         console.log("maxSpawn: " + this.maxSpawnDelay)
         this.minSpawnDelay = this.minSpawnDelay / 1.01
         this.maxSpawnDelay = this.maxSpawnDelay / 1.01
+        GlobalSettings.minSpawnDelay = this.minSpawnDelay
+        GlobalSettings.maxSpawnDelay = this.maxSpawnDelay
 
         // Überprüfen, ob die Animation bereits existiert
         if (!scene.anims.get('enemy_anim')) {
@@ -293,6 +303,7 @@ class GameScene extends Phaser.Scene {
 
     // Spawning der Flasche
     spawnBottle(scene, x, y) {
+        if (this.movingObject) {
         var difficulty = this.counter / 2;
         // Festlegen der Startposition der Flasche am oberen Bildschirmrand
         var xPos = Phaser.Math.Between(0, scene.sys.canvas.width);
@@ -327,6 +338,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.bottle, this.playerHit, null, this);
         this.physics.add.overlap(this.movingObject, this.bottle, this.bottleToEnemy, null, this);
         return this.bottle;
+    }
     }
 
     // Zähler erhöhen
@@ -434,7 +446,7 @@ class GameScene extends Phaser.Scene {
     // Zeitereignis für das Spawnen der Flasche
     spawnBottleEvent() {
         this.time.addEvent({
-            delay: Phaser.Math.Between(10000, 15000),
+            delay: Phaser.Math.Between(this.minSpawnDelay, this.maxSpawnDelay),
             callback: () => {
                 this.spawnBottle(this, Phaser.Math.Between(0, 1000), Phaser.Math.Between(0, 500));
                 this.spawnBottleEvent();
@@ -451,14 +463,16 @@ class GameScene extends Phaser.Scene {
 
     enterShop() {
         this.scene.start('DecorScene', {
-            score: this.score+100000,
+            score: this.score,
             lives: this.lives,
             playerJumpHeight: this.playerJumpHeight,
             playerSpeed: this.playerSpeed,
-            playerAttackRange: this.playerAttackRange
+            playerAttackRange: this.playerAttackRange,
+            minSpawnDelay: this.minSpawnDelay,
+            maxSpawnDelay: this.maxSpawnDelay
         });
-        this.stopMusic()
     }
 }
+        
 
 export default GameScene;
