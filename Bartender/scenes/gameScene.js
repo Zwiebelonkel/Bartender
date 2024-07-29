@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 6000,
+            delay: 60000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
@@ -236,6 +236,10 @@ class GameScene extends Phaser.Scene {
             this.physics.add.overlap(this.hitbox, this.movingObject, this.handleCollision, null, this);
         }
 
+        if (this.bottle) {
+            this.physics.add.overlap(this.hitbox, this.bottle, this.throwBottle, null, this);
+        }
+
         return this.hitbox;
     }
 
@@ -320,7 +324,7 @@ class GameScene extends Phaser.Scene {
 
         // Kollision des Spielers mit der Flasche überwachen
         this.physics.add.overlap(this.player, this.bottle, this.playerHit, null, this);
-
+        this.physics.add.overlap(this.movingObject, this.bottle, this.bottleToEnemy, null, this);
         return this.bottle;
     }
 
@@ -347,6 +351,23 @@ class GameScene extends Phaser.Scene {
         console.log('Enemy destroyed!');
     }
 
+    throwBottle(hitbox, bottle){
+        bottle.setVelocityY(0);
+        if (this.direction == 'left') {
+            bottle.setVelocityX(-500);
+        } else {
+            bottle.setVelocityX(500);
+        }
+        if (!this.isPunchPlaying) {
+            var punch = this.sound.add('punch');
+            punch.play();
+            this.isPunchPlaying = true;
+        }
+        this.score += 10
+        this.scoreText.setText('Score: ' + this.score);
+        console.log('Bottle thrown!');
+    }
+
     // Spieler-Kollision behandeln
     playerHit(player, object) {
         if (object === this.movingObject && Math.abs(player.x - object.x) < 10) {
@@ -364,6 +385,11 @@ class GameScene extends Phaser.Scene {
                 this.GameOver();
             }
         }
+    }
+
+    bottleToEnemy(bottle, enemy) {
+        bottle.destroy()
+        enemy.destroy()
     }
 
     GameOver() {
