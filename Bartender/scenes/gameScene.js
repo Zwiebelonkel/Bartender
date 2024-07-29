@@ -131,7 +131,14 @@ class GameScene extends Phaser.Scene {
     }
 
     
-
+    init(data) {
+        console.log('Data received from ShopScene:', data); // Debugging-Ausgabe
+        this.score = data.score || this.score; // Fallback, falls data.score undefined ist
+        this.lives = data.lives || this.lives;
+        this.playerJumpHeight = data.playerJumpHeight || this.playerJumpHeight;
+        this.playerSpeed = data.playerSpeed || this.playerSpeed;
+        this.playerAttackRange = data.playerAttackRange || this.playerAttackRange;
+    }
     update() {
         if (this.gameOver) {
             return;
