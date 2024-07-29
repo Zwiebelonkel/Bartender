@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 60000,
+            delay: 6000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
