@@ -1,11 +1,15 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
-        this.isWhooshPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
-        this.isJumpPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
-        this.isPunchPlaying = false; // Variable zum Verfolgen des whoosh-Sounds
+        this.isWhooshPlaying = false;
+        this.isJumpPlaying = false;
+        this.isPunchPlaying = false;
         this.highscoreFile = 'highscore.txt';
-        this.lives = 3; // Spieler startet mit 3 Leben
+        this.lives = 3;
+        this.score = 0;
+        this.playerJumpHeight = -500;
+        this.playerSpeed = 400;
+        this.playerAttackRange = 200;
     }
 
     preload() {
