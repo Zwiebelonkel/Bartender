@@ -1,3 +1,10 @@
+// Globales Objekt zum Speichern des Kaufstatus von Dekorationen
+let purchasedDecorations = {
+    sofa: false,
+    painting: false,
+    lamp: false
+};
+
 class DecorScene extends Phaser.Scene {
     constructor() {
         super({ key: 'DecorScene' });
@@ -9,6 +16,12 @@ class DecorScene extends Phaser.Scene {
         this.playerJumpHeight = data.playerJumpHeight;
         this.playerSpeed = data.playerSpeed;
         this.playerAttackRange = data.playerAttackRange;
+
+        // Laden des Kaufstatus von Dekorationen
+        const savedData = window.localStorage.getItem('purchasedDecorations');
+        if (savedData) {
+            purchasedDecorations = JSON.parse(savedData);
+        }
     }
 
     preload() {
@@ -18,7 +31,7 @@ class DecorScene extends Phaser.Scene {
         this.load.image('painting', 'assets/painting.png');
         this.load.image('lamp', 'assets/lamp.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
-
+        this.load.image('ground', 'assets/platform.png');
     }
 
     create() {
@@ -26,6 +39,9 @@ class DecorScene extends Phaser.Scene {
         this.add.image(500, 375, 'house_bg');
         this.add.text(16, 16, 'Decorations Shop', { fontSize: '32px', fill: '#000' });
         this.moneyText = this.add.text(16, 48, `Money: ${this.score}`, { fontSize: '32px', fill: '#000' });
+
+        // Bereits gekaufte Dekorationen anzeigen
+        this.displayPurchasedDecorations();
 
         // Dekorationsbuttons erstellen
         this.createDecorButton('Sofa - $50', 100, 100, 'sofa', 50);
@@ -35,45 +51,47 @@ class DecorScene extends Phaser.Scene {
         // Button zur ShopScene für Upgrades
         this.createUpgradeButton('Go to Upgrades', 100, 300, () => this.goToShopScene());
 
-                // Spieler-Charakter
-                this.player = this.physics.add.sprite(300, 450, 'dude');
-                this.player.setBounce(0.3);
-                this.player.setCollideWorldBounds(true);
-                this.player.setScale(5);
-        
-                // Hitbox des Spielers anpassen (falls zu groß)
-                this.player.setSize(32, 32).setOffset(0, 0);
-        
-                // Animationen für den Spieler-Charakter
-                this.anims.create({
-                    key: 'left',
-                    frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
-                    frameRate: 8,
-                    repeat: -1
-                });
-        
-                this.anims.create({
-                    key: 'idle',
-                    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-                    frameRate: 1,
-                    repeat: -1
-                });
-        
-                this.anims.create({
-                    key: 'right',
-                    frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 8 }),
-                    frameRate: 8,
-                    repeat: -1
-                });
-        
-                this.player.anims.play('idle');
-        
-                // Steuerung
-                this.cursors = this.input.keyboard.createCursorKeys();
+        // Spieler-Charakter
+        this.player = this.physics.add.sprite(300, 450, 'dude');
+        this.player.setBounce(0.3);
+        this.player.setCollideWorldBounds(true);
+        this.player.setScale(5);
+
+        // Hitbox des Spielers anpassen (falls zu groß)
+        this.player.setSize(32, 32).setOffset(0, 0);
+
+        // Animationen für den Spieler-Charakter
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+            frameRate: 1,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 8 }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.player.anims.play('idle');
+
+        // Steuerung
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.platforms = this.physics.add.staticGroup();
+        this.platforms.create(1000, 825, 'ground').setScale(5).refreshBody();
+        this.physics.add.collider(this.player, this.platforms);
     }
 
     update() {
-
         if (this.gameOver) {
             return;
         }
@@ -116,12 +134,30 @@ class DecorScene extends Phaser.Scene {
     }
 
     buyDecoration(itemKey, cost) {
-        if (this.score >= cost) {
+        if (this.score >= cost && !purchasedDecorations[itemKey]) {
             this.score -= cost;
             this.moneyText.setText(`Money: ${this.score}`);
-            this.add.image(400, 300, itemKey).setScale(0.5); // Fügen Sie das gekaufte Objekt hinzu, skaliert es nach Bedarf
+            this.add.image(400, 300, itemKey).setScale(0.5);
+            purchasedDecorations[itemKey] = true;
+
+            // Kaufstatus speichern
+            window.localStorage.setItem('purchasedDecorations', JSON.stringify(purchasedDecorations));
+        } else if (purchasedDecorations[itemKey]) {
+            this.add.text(16, 80, 'Already purchased!', { fontSize: '24px', fill: '#f00' });
         } else {
             this.add.text(16, 80, 'Not enough money!', { fontSize: '24px', fill: '#f00' });
+        }
+    }
+
+    displayPurchasedDecorations() {
+        if (purchasedDecorations.sofa) {
+            this.add.image(400, 300, 'sofa').setScale(0.5);
+        }
+        if (purchasedDecorations.painting) {
+            this.add.image(400, 400, 'painting').setScale(0.5);
+        }
+        if (purchasedDecorations.lamp) {
+            this.add.image(400, 500, 'lamp').setScale(0.5);
         }
     }
 
