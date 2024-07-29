@@ -38,6 +38,7 @@ class GameScene extends Phaser.Scene {
         // Deklaration und Initialisierung der platforms
         this.platforms = this.physics.add.staticGroup();
         this.platforms.create(1000, 825, 'ground').setScale(5).refreshBody();
+        this.platforms.create(400,500, 'ground').setScale(1.5, 1).refreshBody();
 
         // Zeitverzögertes Event zum Spawnen des Feindes mit festem Startintervall
         this.spawnEnemyEvent();
@@ -47,7 +48,7 @@ class GameScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(300, 450, 'dude');
         this.player.setBounce(0.3);
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(10);
+        this.player.setScale(5);
 
         // Hitbox des Spielers anpassen (falls zu groß)
         this.player.setSize(32, 32).setOffset(0, 0);
@@ -170,7 +171,7 @@ class GameScene extends Phaser.Scene {
         } else if ((this.cursors.down.isDown) && (this.direction == "right")) {
             this.player.setVelocityX(0);
             this.player.anims.play('attack1', true);
-            let hitbox = this.createHitbox(this.player.x + 200, this.player.y).setScale(5);
+            let hitbox = this.createHitbox(this.player.x + 100, this.player.y).setScale(2.5);
             if (!this.isWhooshPlaying) {
                 var whoosh = this.sound.add('whoosh');
                 whoosh.play();
@@ -179,7 +180,7 @@ class GameScene extends Phaser.Scene {
         } else if ((this.cursors.down.isDown) && (this.direction == "left")) {
             this.player.setVelocityX(0);
             this.player.anims.play('attack2', true);
-            let hitbox = this.createHitbox(this.player.x - 200, this.player.y).setScale(5);
+            let hitbox = this.createHitbox(this.player.x - 100, this.player.y).setScale(2.5);
             if (!this.isWhooshPlaying) {
                 var whoosh = this.sound.add('whoosh');
                 whoosh.play();
@@ -251,11 +252,11 @@ class GameScene extends Phaser.Scene {
         var xPos = spawnDirection === 0 ? 0 : 1000;
         var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty);
 
-        this.movingObject = scene.physics.add.sprite(xPos, 600, 'enemy'); // Richtiges Spritesheet verwenden
+        this.movingObject = scene.physics.add.sprite(xPos, scene.sys.canvas.height-90, 'enemy'); // Richtiges Spritesheet verwenden
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
         this.movingObject.setVelocityX(velocityX);
-        this.movingObject.setScale(10);
+        this.movingObject.setScale(5);
 
         console.log("Enemy Velocity: " + this.movingObject.body.velocity.x);
         console.log("minSpawn: " + this.minSpawnDelay)
@@ -305,7 +306,7 @@ class GameScene extends Phaser.Scene {
         this.bottle.body.allowGravity = false;
         this.bottle.setCollideWorldBounds(false);
         this.bottle.setVelocity(velocityX, velocityY);
-        this.bottle.setScale(5);
+        this.bottle.setScale(2.5);
 
         console.log("Bottle Velocity: " + this.bottle.body.velocity.y);
 
@@ -352,7 +353,7 @@ class GameScene extends Phaser.Scene {
     }
 
     throwBottle(hitbox, bottle){
-        bottle.setVelocityY(0);
+        bottle.setVelocityY(20);
         if (this.direction == 'left') {
             bottle.setVelocityX(-500);
         } else {
@@ -388,6 +389,7 @@ class GameScene extends Phaser.Scene {
     }
 
     bottleToEnemy(bottle, enemy) {
+        console.log("gegnerflasche")
         bottle.destroy()
         enemy.destroy()
     }
