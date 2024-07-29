@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 60000,
+            delay: 6000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
@@ -152,6 +152,8 @@ class GameScene extends Phaser.Scene {
         this.playerAttackRange = data.playerAttackRange || this.playerAttackRange;
     }
     update() {
+        this.livesText.setText('Lives: ' + this.lives); // Lebensanzeige aktualisieren
+
         if (this.gameOver) {
             return;
         }
