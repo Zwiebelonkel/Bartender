@@ -194,7 +194,7 @@ class GameScene extends Phaser.Scene {
 
         // Sprung
         if (this.cursors.up.isDown && this.player.body.touching.down) {
-            this.player.setVelocityY(-500);
+            this.player.setVelocityY(this.playerJumpHeight);
             if (!this.isjumpPlaying) {
                 var jump = this.sound.add('jump');
                 jump.play();
