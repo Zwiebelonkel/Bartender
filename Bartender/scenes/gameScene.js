@@ -117,6 +117,13 @@ class GameScene extends Phaser.Scene {
             loop: true
         });
 
+        this.time.addEvent({
+            delay: 60000,
+            callback: this.enterShop,
+            callbackScope: this,
+            loop: false
+        });
+
         // Debug-Ansicht der Hitboxen einschalten
         // this.physics.world.createDebugGraphic();
         // this.debugGraphics = this.add.graphics();
