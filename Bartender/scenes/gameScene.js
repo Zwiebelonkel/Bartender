@@ -38,7 +38,7 @@ class GameScene extends Phaser.Scene {
         // Deklaration und Initialisierung der platforms
         this.platforms = this.physics.add.staticGroup();
         this.platforms.create(1000, 825, 'ground').setScale(5).refreshBody();
-        this.platforms.create(400,500, 'ground').setScale(1.5, 1).refreshBody();
+        this.platforms.create(600,500, 'ground').setScale(2.1, 1).refreshBody().setVisible(false);
 
         // Zeitverzögertes Event zum Spawnen des Feindes mit festem Startintervall
         this.spawnEnemyEvent();
@@ -119,7 +119,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 60000,
+            delay: 30000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
@@ -451,7 +451,7 @@ class GameScene extends Phaser.Scene {
 
     enterShop() {
         this.scene.start('ShopScene', {
-            score: this.score+1000,
+            score: this.score+100000,
             lives: this.lives,
             playerJumpHeight: this.playerJumpHeight,
             playerSpeed: this.playerSpeed,
