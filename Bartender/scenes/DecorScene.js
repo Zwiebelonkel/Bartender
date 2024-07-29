@@ -151,13 +151,13 @@ class DecorScene extends Phaser.Scene {
 
     displayPurchasedDecorations() {
         if (purchasedDecorations.sofa) {
-            this.add.image(400, 300, 'sofa').setScale(0.5);
+            this.add.image(400, 630, 'sofa').setScale(7);
         }
         if (purchasedDecorations.painting) {
-            this.add.image(400, 400, 'painting').setScale(0.5);
+            this.add.image(600, 610, 'painting').setScale(5);
         }
         if (purchasedDecorations.lamp) {
-            this.add.image(400, 500, 'lamp').setScale(0.5);
+            this.add.image(380, 570, 'lamp').setScale(3);
         }
     }
 

@@ -13,7 +13,7 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('bg', 'assets/bg.png');
+        this.load.image('bg', 'assets/bg(old).png');
         this.load.image('ground', 'assets/platform.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('bottle', 'assets/bottle.png', { frameWidth: 32, frameHeight: 32 });
@@ -119,7 +119,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 3000,
+            delay: 10000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
