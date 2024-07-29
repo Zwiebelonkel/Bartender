@@ -8,7 +8,7 @@ class GameScene extends Phaser.Scene {
         this.isPunchPlaying = false;
         this.highscoreFile = 'highscore.txt';
         this.lives = 3;
-        this.score = 0;
+        this.score = GlobalSettings.money;
         this.playerJumpHeight = -500;
         this.playerSpeed = 400;
         this.playerAttackRange = 200;
@@ -29,7 +29,6 @@ class GameScene extends Phaser.Scene {
     create() {
         this.add.image(500, 375, 'bg');
         this.counter = 0;
-        this.score = 0;
 
         // Festlegung von Startwerten für min und max
         this.minSpawnDelay = GlobalSettings.minSpawnDelay;
@@ -100,7 +99,7 @@ class GameScene extends Phaser.Scene {
         });
 
         // Punkteanzeige
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+        this.scoreText = this.add.text(16, 16, 'Score: '+this.score, { fontSize: '32px', fill: '#000' });
         this.counterText = this.add.text(16, 48, 'Time: 0', { fontSize: '32px', fill: '#000' });
         this.livesText = this.add.text(16, 80, 'Lives: 3', { fontSize: '32px', fill: '#000' }); // Lebensanzeige
 
@@ -118,14 +117,14 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 10000,
+            delay: 60000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
         });
 
         // Debug-Ansicht der Hitboxen einschalten
-        this.physics.world.createDebugGraphic();
+        // this.physics.world.createDebugGraphic();
         // this.debugGraphics = this.add.graphics();
         // this.debugGraphics.lineStyle(2, 0xff00ff, 1);
         this.events.on('resume', (scene, data) => {
@@ -252,7 +251,7 @@ class GameScene extends Phaser.Scene {
     // Spawning des Feindes
     spawnEnemy(scene, x, y) {
         console.log("difficulty: "+difficulty)
-        var difficulty = GlobalSettings.difficulty+ this.counter / 2;
+        var difficulty = GlobalSettings.difficulty+ this.counter / 4;
         GlobalSettings.difficulty = difficulty;
         var spawnDirection = Phaser.Math.Between(0, 1);
 
@@ -358,7 +357,8 @@ class GameScene extends Phaser.Scene {
             punch.play();
             this.isPunchPlaying = true;
         }
-        this.score += 5
+        this.score += 8
+        GlobalSettings.money += 8
         this.scoreText.setText('Score: ' + this.score);
         console.log('Enemy destroyed!');
     }
@@ -375,7 +375,8 @@ class GameScene extends Phaser.Scene {
             punch.play();
             this.isPunchPlaying = true;
         }
-        this.score += 2
+        this.score += 5
+        GlobalSettings.money += 5
         this.scoreText.setText('Score: ' + this.score);
         console.log('Bottle thrown!');
     }

@@ -37,7 +37,7 @@ class DecorScene extends Phaser.Scene {
     create() {
         // Hintergrundbild des Hauses setzen
         this.add.image(500, 375, 'house_bg');
-        this.add.text(16, 16, 'Decorations Shop', { fontSize: '32px', fill: '#000' });
+        this.add.text(16, 16, 'Home', { fontSize: '32px', fill: '#000' });
         this.moneyText = this.add.text(16, 48, `Money: ${this.score}`, { fontSize: '32px', fill: '#000' });
 
         // Bereits gekaufte Dekorationen anzeigen
@@ -137,21 +137,22 @@ class DecorScene extends Phaser.Scene {
         if (this.score >= cost && !purchasedDecorations[itemKey]) {
             this.score -= cost;
             this.moneyText.setText(`Money: ${this.score}`);
-            this.add.image(400, 300, itemKey).setScale(0.5);
             purchasedDecorations[itemKey] = true;
 
             // Kaufstatus speichern
             window.localStorage.setItem('purchasedDecorations', JSON.stringify(purchasedDecorations));
+            this.add.text(180, 400, 'Your order will be delivered \n tommorow!', { fontSize: '40px', fill: '#000' });
         } else if (purchasedDecorations[itemKey]) {
             this.add.text(16, 80, 'Already purchased!', { fontSize: '24px', fill: '#f00' });
         } else {
             this.add.text(16, 80, 'Not enough money!', { fontSize: '24px', fill: '#f00' });
         }
+        
     }
 
     displayPurchasedDecorations() {
         if (purchasedDecorations.sofa) {
-            this.add.image(400, 630, 'sofa').setScale(7);
+            this.add.image(400, 630, 'sofa').setScale(7)
         }
         if (purchasedDecorations.painting) {
             this.add.image(600, 610, 'painting').setScale(5);
