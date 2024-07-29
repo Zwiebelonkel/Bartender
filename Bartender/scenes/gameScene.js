@@ -118,14 +118,14 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: 6000,
+            delay: 60000,
             callback: this.enterShop,
             callbackScope: this,
             loop: false
         });
 
         // Debug-Ansicht der Hitboxen einschalten
-        // this.physics.world.createDebugGraphic();
+        this.physics.world.createDebugGraphic();
         // this.debugGraphics = this.add.graphics();
         // this.debugGraphics.lineStyle(2, 0xff00ff, 1);
         this.events.on('resume', (scene, data) => {
@@ -200,11 +200,6 @@ class GameScene extends Phaser.Scene {
                 jump.play();
                 this.isjumpPlaying = true;
             }
-        }
-
-        // Überprüfung der Kollision basierend auf der x-Koordinate
-        if (this.movingObject && Math.abs(this.player.x - this.movingObject.x) < 10) {
-            this.playerHit();
         }
     }
 
