@@ -128,6 +128,17 @@ class GameScene extends Phaser.Scene {
         // this.physics.world.createDebugGraphic();
         // this.debugGraphics = this.add.graphics();
         // this.debugGraphics.lineStyle(2, 0xff00ff, 1);
+        this.events.on('resume', (scene, data) => {
+            console.log('Resuming GameScene with data:', data); // Debugging-Ausgabe
+            if (data) {
+                this.score = data.score || this.score;
+                this.lives = data.lives || this.lives;
+                this.playerJumpHeight = data.playerJumpHeight || this.playerJumpHeight;
+                this.playerSpeed = data.playerSpeed || this.playerSpeed;
+                this.playerAttackRange = data.playerAttackRange || this.playerAttackRange;
+                this.livesText.setText('Lives: ' + this.lives);
+            }
+        });
     }
 
     
