@@ -393,6 +393,17 @@ class GameScene extends Phaser.Scene {
             this.music.stop();
         }
     }
+
+    enterShop() {
+        this.scene.start('ShopScene', {
+            score: this.score+1000,
+            lives: this.lives,
+            playerJumpHeight: this.playerJumpHeight,
+            playerSpeed: this.playerSpeed,
+            playerAttackRange: this.playerAttackRange
+        });
+        this.stopMusic()
+    }
 }
 
 export default GameScene;
