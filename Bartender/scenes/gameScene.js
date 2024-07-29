@@ -339,6 +339,7 @@ class GameScene extends Phaser.Scene {
             }
         } else if (object === this.bottle && Math.abs(player.x - object.x) < 20) {
             this.lives--;
+            this.bottle.destroy();
             this.livesText.setText('Lives: ' + this.lives); // Lebensanzeige aktualisieren
             if (this.lives <= 0) {
                 this.GameOver();
