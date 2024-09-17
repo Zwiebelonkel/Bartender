@@ -26,12 +26,12 @@ class DecorScene extends Phaser.Scene {
 
     preload() {
         // Hier laden wir die notwendigen Assets für die Dekorationen und das Haus
-        this.load.image('house_bg', 'assets/bg.png');
-        this.load.image('sofa', 'assets/sofa.png');
-        this.load.image('painting', 'assets/painting.png');
-        this.load.image('lamp', 'assets/lamp.png');
-        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
-        this.load.image('ground', 'assets/platform.png');
+        this.load.image('house_bg', 'bg.png');
+        this.load.image('sofa', 'sofa.png');
+        this.load.image('painting', 'painting.png');
+        this.load.image('lamp', 'lamp.png');
+        this.load.spritesheet('dude', 'dude.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.image('ground', 'platform.png');
     }
 
     create() {
@@ -105,7 +105,7 @@ class DecorScene extends Phaser.Scene {
             this.player.setVelocityX(this.playerSpeed);
             this.player.anims.play('right', true);
             this.direction = "right";
-        
+
         } else {
             this.player.setVelocityX(0);
             if (!this.player.anims.currentAnim || this.player.anims.currentAnim.key !== 'idle') {
@@ -147,7 +147,7 @@ class DecorScene extends Phaser.Scene {
         } else {
             this.add.text(16, 80, 'Not enough money!', { fontSize: '24px', fill: '#f00' });
         }
-        
+
     }
 
     displayPurchasedDecorations() {

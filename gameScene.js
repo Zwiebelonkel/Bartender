@@ -14,15 +14,15 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('bg', 'assets/bg(old).png');
-        this.load.image('ground', 'assets/platform.png');
-        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet('bottle', 'assets/bottle.png', { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet('enemy', 'assets/enemy.png', { frameWidth: 32, frameHeight: 32 });
-        this.load.audio('backgroundMusic', 'assets/soundtrack.wav');
-        this.load.audio('whoosh', 'assets/whoosh.wav');
-        this.load.audio('jump', 'assets/jump.wav');
-        this.load.audio('punch', 'assets/punch.wav');
+        this.load.image('bg', 'bg(old).png');
+        this.load.image('ground', 'platform.png');
+        this.load.spritesheet('dude', 'dude.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('bottle', 'bottle.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('enemy', 'enemy.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.audio('backgroundMusic', 'soundtrack.wav');
+        this.load.audio('whoosh', 'whoosh.wav');
+        this.load.audio('jump', 'jump.wav');
+        this.load.audio('punch', 'punch.wav');
     }
 
     create() {
@@ -98,7 +98,7 @@ class GameScene extends Phaser.Scene {
         });
 
         // Punkteanzeige
-        this.scoreText = this.add.text(16, 16, 'Score: '+this.score, { fontSize: '32px', fill: '#000' });
+        this.scoreText = this.add.text(16, 16, 'Score: ' + this.score, { fontSize: '32px', fill: '#000' });
         this.counterText = this.add.text(16, 48, 'Time: 0', { fontSize: '32px', fill: '#000' });
         this.livesText = this.add.text(16, 80, 'Lives: 3', { fontSize: '32px', fill: '#000' }); // Lebensanzeige
 
@@ -137,13 +137,13 @@ class GameScene extends Phaser.Scene {
                 this.minSpawnDelay = data.minSpawnDelay || this.initialMin;
                 this.maxSpawnDelay = data.maxSpawnDelay || this.initialMax;
                 this.livesText.setText('Lives: ' + this.lives);
-                
+
             }
         });
-        
+
     }
 
-    
+
     init(data) {
         console.log('Data received from ShopScene:', data); // Debugging-Ausgabe
         this.score = data.score || this.score; // Fallback, falls data.score undefined ist
@@ -249,15 +249,15 @@ class GameScene extends Phaser.Scene {
 
     // Spawning des Feindes
     spawnEnemy(scene, x, y) {
-        console.log("difficulty: "+difficulty)
-        var difficulty = GlobalSettings.difficulty+ this.counter / 4;
+        console.log("difficulty: " + difficulty)
+        var difficulty = GlobalSettings.difficulty + this.counter / 4;
         GlobalSettings.difficulty = difficulty;
         var spawnDirection = Phaser.Math.Between(0, 1);
 
         var xPos = spawnDirection === 0 ? 0 : 1000;
         var velocityX = spawnDirection === 0 ? (300 + difficulty) : -(300 + difficulty);
 
-        this.movingObject = scene.physics.add.sprite(xPos, scene.sys.canvas.height-90, 'enemy'); // Richtiges Spritesheet verwenden
+        this.movingObject = scene.physics.add.sprite(xPos, scene.sys.canvas.height - 90, 'enemy'); // Richtiges Spritesheet verwenden
         this.movingObject.body.allowGravity = false;
         this.movingObject.setCollideWorldBounds(false);
         this.movingObject.setVelocityX(velocityX);
@@ -301,41 +301,41 @@ class GameScene extends Phaser.Scene {
     // Spawning der Flasche
     spawnBottle(scene, x, y) {
         if (this.movingObject) {
-        var difficulty = this.counter / 2;
-        // Festlegen der Startposition der Flasche am oberen Bildschirmrand
-        var xPos = Phaser.Math.Between(0, scene.sys.canvas.width);
-        var yPos = 0;
+            var difficulty = this.counter / 2;
+            // Festlegen der Startposition der Flasche am oberen Bildschirmrand
+            var xPos = Phaser.Math.Between(0, scene.sys.canvas.width);
+            var yPos = 0;
 
-        // Geschwindigkeit der Flasche von oben nach unten
-        var velocityX = 0;
-        var velocityY = 200 + difficulty; // Schneller als der Feind, aber langsamer als der Spieler
+            // Geschwindigkeit der Flasche von oben nach unten
+            var velocityX = 0;
+            var velocityY = 200 + difficulty; // Schneller als der Feind, aber langsamer als der Spieler
 
-        this.bottle = scene.physics.add.sprite(xPos, yPos, 'bottle');
-        this.bottle.body.allowGravity = false;
-        this.bottle.setCollideWorldBounds(false);
-        this.bottle.setVelocity(velocityX, velocityY);
-        this.bottle.setScale(2.5);
+            this.bottle = scene.physics.add.sprite(xPos, yPos, 'bottle');
+            this.bottle.body.allowGravity = false;
+            this.bottle.setCollideWorldBounds(false);
+            this.bottle.setVelocity(velocityX, velocityY);
+            this.bottle.setScale(2.5);
 
-        console.log("Bottle Velocity: " + this.bottle.body.velocity.y);
+            console.log("Bottle Velocity: " + this.bottle.body.velocity.y);
 
-        if (!scene.anims.get('bottle')) {
-            // Animation erstellen, wenn sie nicht existiert
-            scene.anims.create({
-                key: 'bottle',
-                frames: scene.anims.generateFrameNumbers('bottle', { start: 0, end: 3 }),
-                frameRate: 10,
-                repeat: -1
-            });
+            if (!scene.anims.get('bottle')) {
+                // Animation erstellen, wenn sie nicht existiert
+                scene.anims.create({
+                    key: 'bottle',
+                    frames: scene.anims.generateFrameNumbers('bottle', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+            }
+
+            // Animation auf dem Sprite anwenden
+            this.bottle.anims.play('bottle', true);
+
+            // Kollision des Spielers mit der Flasche überwachen
+            this.physics.add.overlap(this.player, this.bottle, this.playerHit, null, this);
+            this.physics.add.overlap(this.movingObject, this.bottle, this.bottleToEnemy, null, this);
+            return this.bottle;
         }
-
-        // Animation auf dem Sprite anwenden
-        this.bottle.anims.play('bottle', true);
-
-        // Kollision des Spielers mit der Flasche überwachen
-        this.physics.add.overlap(this.player, this.bottle, this.playerHit, null, this);
-        this.physics.add.overlap(this.movingObject, this.bottle, this.bottleToEnemy, null, this);
-        return this.bottle;
-    }
     }
 
     // Zähler erhöhen
@@ -362,7 +362,7 @@ class GameScene extends Phaser.Scene {
         console.log('Enemy destroyed!');
     }
 
-    throwBottle(hitbox, bottle){
+    throwBottle(hitbox, bottle) {
         bottle.setVelocityY(20);
         if (this.direction == 'left') {
             bottle.setVelocityX(-500);
@@ -453,6 +453,6 @@ class GameScene extends Phaser.Scene {
         });
     }
 }
-        
+
 
 export default GameScene;

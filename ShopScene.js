@@ -12,7 +12,7 @@ class ShopScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('shop', 'assets/shop.png');
+        this.load.image('shop', 'shop.png');
     }
 
     create() {
