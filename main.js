@@ -3,7 +3,7 @@ import GameScene from './gameScene.js';
 import GameOver from './gameOver.js';
 import Options from './optionScene.js';
 import ShopScene from './ShopScene.js';
-import DecorScene from './decorScene.js';
+import DecorScene from './DecorScene.js';
 
 
 var config = {
