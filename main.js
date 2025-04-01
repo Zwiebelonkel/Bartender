@@ -1,9 +1,9 @@
-import StartMenu from '/mainMenu.js';
-import GameScene from '/gameScene.js';
-import GameOver from '/gameOver.js';
-import Options from '/optionScene.js';
-import ShopScene from '/ShopScene.js';
-import DecorScene from '/decorScene.js';
+import StartMenu from './mainMenu.js';
+import GameScene from './gameScene.js';
+import GameOver from './gameOver.js';
+import Options from './optionScene.js';
+import ShopScene from './ShopScene.js';
+import DecorScene from './decorScene.js';
 
 
 var config = {
